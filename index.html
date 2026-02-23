@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clean Salone Make Salone Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F7F4EE;
+    --dark: #0E1A12;
+    --green: #1E5C2E;
+    --accent: #3A9C52;
+    --lime: #7DC95E;
+    --muted: #8A9E8F;
+    --text: #1A2E1E;
+    --cream: #F7F4EE;
+    --sand: #EDE9E0;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s ease, width 0.25s ease, height 0.25s ease, opacity 0.2s ease;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: transparent;
+    transition: background 0.4s ease, padding 0.3s ease;
+  }
+  nav.scrolled {
+    background: rgba(247,244,238,0.95);
+    backdrop-filter: blur(12px);
+    padding: 16px 48px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+  }
+  .nav-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--dark);
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 64px 80px;
+    background: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Organic blob in hero */
+  .hero-blob {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+    background: radial-gradient(circle at 40% 40%, rgba(58,156,82,0.18) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    animation: morph 10s infinite ease-in-out;
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; }
+    33% { border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%; }
+    66% { border-radius: 70% 30% 50% 50% / 30% 70% 50% 50%; }
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--lime);
+    font-weight: 500;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--lime);
+  }
+
+  .hero-h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(42px, 5vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+  .hero-h1 em {
+    color: var(--lime);
+    font-style: italic;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    max-width: 380px;
+    line-height: 1.75;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s forwards;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, gap 0.2s;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.65s forwards;
+    width: fit-content;
+  }
+  .hero-cta:hover { background: var(--lime); gap: 18px; color: var(--dark); }
+  .hero-cta svg { transition: transform 0.2s; }
+  .hero-cta:hover svg { transform: translateX(4px); }
+
+  .hero-right {
+    background: var(--sand);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 64px 80px;
+    gap: 0;
+    position: relative;
+  }
+
+  .hero-stat {
+    padding: 36px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    opacity: 0;
+    animation: fadeUp 0.9s forwards;
+  }
+  .hero-stat:last-child { border-bottom: none; }
+  .hero-stat:nth-child(1) { animation-delay: 0.4s; }
+  .hero-stat:nth-child(2) { animation-delay: 0.55s; }
+  .hero-stat:nth-child(3) { animation-delay: 0.7s; }
+
+  .stat-number {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    color: var(--green);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  .stat-src {
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MISSION */
+  .mission {
+    padding: 120px 64px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    align-items: start;
+    background: var(--cream);
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .mission-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    padding-top: 8px;
+  }
+  .mission-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--dark);
+  }
+  .mission-text em { color: var(--accent); font-style: italic; }
+
+  /* PROBLEM */
+  .problem {
+    background: var(--dark);
+    padding: 120px 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .problem-card {
+    background: rgba(255,255,255,0.04);
+    padding: 48px 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.3s;
+  }
+  .problem-card:hover { background: rgba(255,255,255,0.07); }
+  .problem-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 72px;
+    color: rgba(58,156,82,0.2);
+    line-height: 1;
+    margin-bottom: 24px;
+    letter-spacing: -0.04em;
+  }
+  .problem-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .problem-body { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.75; }
+
+  /* SOLUTION */
+  .solution {
+    padding: 120px 64px;
+    background: var(--sand);
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding-bottom: 32px;
+  }
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    letter-spacing: -0.03em;
+    color: var(--dark);
+    line-height: 1.1;
+  }
+  .section-sub { font-size: 13px; color: var(--muted); max-width: 260px; text-align: right; line-height: 1.6; }
+  .solution-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  .sol-item {
+    background: var(--cream);
+    padding: 40px;
+    display: flex;
+    gap: 24px;
+    transition: background 0.2s;
+  }
+  .sol-item:hover { background: #fff; }
+  .sol-icon {
+    width: 48px; height: 48px;
+    background: var(--green);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .sol-title { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--dark); margin-bottom: 8px; }
+  .sol-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* TEAM */
+  .team {
+    background: var(--cream);
+    padding: 120px 64px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .team img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+  .team-card {
+    background: var(--sand);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .team-card:hover { background: var(--dark); }
+  .team-card:hover .team-name { color: #fff; }
+  .team-card:hover .team-role { color: var(--lime); }
+  .team-card:hover .team-initial { color: rgba(255,255,255,0.06); }
+  .team-initial {
+    font-family: 'Instrument Serif', serif;
+    font-size: 120px;
+    line-height: 1;
+    color: rgba(0,0,0,0.05);
+    position: absolute;
+    top: -16px; right: -8px;
+    pointer-events: none;
+    transition: color 0.3s;
+  }
+  .team-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-bottom: 32px;
+  }
+  .team-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    color: var(--dark);
+    line-height: 1.2;
+    margin-bottom: 8px;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .team-role {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 500;
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  /* IMPACT */
+  .impact {
+    background: var(--green);
+    padding: 100px 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2px;
+  }
+  .impact-item {
+    padding: 40px 32px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .impact-val {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    color: var(--lime);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: -0.03em;
+  }
+  .impact-lbl { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+  .impact-src { font-size: 10px; color: var(--lime); margin-top: 6px; opacity: 0.7; }
+
+  /* FOOTER */
+  footer {
+    background: var(--dark);
+    padding: 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: end;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-brand {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .footer-brand span { color: var(--lime); }
+  .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.4); }
+  .footer-right { text-align: right; }
+  .footer-contact { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.9; }
+  .footer-contact a { color: var(--lime); text-decoration: none; }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 24px; }
+
+  /* Scroll reveal */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 100px 32px 60px; }
+    .mission { grid-template-columns: 1fr; gap: 24px; padding: 80px 32px; }
+    .problem { grid-template-columns: 1fr; padding: 80px 32px; }
+    .solution { padding: 80px 32px; }
+    .solution-grid { grid-template-columns: 1fr; }
+    .team { padding: 80px 32px; }
+    .team-grid { grid-template-columns: 1fr 1fr; }
+    .impact { grid-template-columns: 1fr 1fr; padding: 80px 32px; }
+    footer { grid-template-columns: 1fr; padding: 48px 32px; }
+    .footer-right { text-align: left; }
+    nav { padding: 20px 32px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Clean <span>Salone</span></div>
+  <ul class="nav-links">
+    <li><a href="#mission">Mission</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#impact">Impact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-blob"></div>
+    <div class="hero-tag">Freetown, Sierra Leone · 2026</div>
+    <h1 class="hero-h1">Making Salone<br><em>Clean Again</em></h1>
+    <p class="hero-desc">A community-first waste collection startup turning Freetown's biggest environmental crisis into reliable, affordable, and dignified service.</p>
+    <a href="#mission" class="hero-cta">
+      Learn More
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat">
+      <div class="stat-number">77%</div>
+      <div class="stat-label">Report health problems from waste</div>
+      <div class="stat-src">↑ Community survey, Freetown Feb 2026</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-number">85%</div>
+      <div class="stat-label">Would recommend a private collection service</div>
+      <div class="stat-src">↑ Community survey, Freetown Feb 2026</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-number">9+</div>
+      <div class="stat-label">Communities already surveyed</div>
+      <div class="stat-src">↑ Community survey, Freetown Feb 2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission reveal" id="mission">
+  <div class="mission-label">Our Mission</div>
+  <div class="mission-text">
+    Reliable, affordable waste collection for every Freetown household — with <em>recycling rewards</em> that turn waste into income.
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="problem-card reveal">
+    <div class="problem-num">01</div>
+    <div class="problem-title">No Reliable System</div>
+    <div class="problem-body">Government trucks are absent. Private collectors are inconsistent. People burn or dump waste — the most dangerous options available.</div>
+  </div>
+  <div class="problem-card reveal reveal-delay-1">
+    <div class="problem-num">02</div>
+    <div class="problem-title">Affordability Trap</div>
+    <div class="problem-body">Most families cannot afford consistent collection. Waste services compete with food. People know burning is harmful — they have no affordable alternative.</div>
+  </div>
+  <div class="problem-card reveal reveal-delay-2">
+    <div class="problem-num">03</div>
+    <div class="problem-title">Dignity Lost</div>
+    <div class="problem-body">Residents don't want to live surrounded by waste. They simply have no other choice. We give them that choice — on their terms.</div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="section-header reveal">
+    <h2 class="section-title">What We<br>Actually Build</h2>
+    <div class="section-sub">A two-phase MVP designed around real community needs — not assumptions.</div>
+  </div>
+  <div class="solution-grid">
+    <div class="sol-item reveal">
+      <div class="sol-icon">📲</div>
+      <div>
+        <div class="sol-title">WhatsApp & USSD Booking</div>
+        <div class="sol-body">Schedule pickups via WhatsApp or basic USSD — no smartphone, no app download required. Works for everyone.</div>
+      </div>
+    </div>
+    <div class="sol-item reveal reveal-delay-1">
+      <div class="sol-icon">📅</div>
+      <div>
+        <div class="sol-title">Scheduled Weekly Pickup</div>
+        <div class="sol-body">Reliable, consistent collection routes. SMS reminders the day before. No guessing when the truck is coming.</div>
+      </div>
+    </div>
+    <div class="sol-item reveal reveal-delay-2">
+      <div class="sol-icon">♻️</div>
+      <div>
+        <div class="sol-title">Green Points Recycling</div>
+        <div class="sol-body">Sort your recyclables and earn Green Points — convert them to mobile money or subscription discounts. Waste becomes income.</div>
+      </div>
+    </div>
+    <div class="sol-item reveal reveal-delay-3">
+      <div class="sol-icon">💵</div>
+      <div>
+        <div class="sol-title">Mobile Money Payments</div>
+        <div class="sol-body">Pay via Orange Money or Afrimoney. Affordable tiered pricing starting from Le 30,000/month for households.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team reveal" id="team">
+  <div class="section-header">
+    <h2 class="section-title">The Founders</h2>
+    <div class="section-sub">Built by people who know Freetown — and care about making it better.</div>
+  </div>
+  <div class="team-grid">
+    <div class="team-card reveal">
+        <img src="h.jpeg" alt="">
+      <div class="team-initial">H</div>
+      <div class="team-dot"></div>
+      <div class="team-name">Hassan Sheriff</div>
+      <div class="team-role">Co-Founder</div>
+    </div>
+    <div class="team-card reveal reveal-delay-1">
+        <img src="h.jpeg" alt="">
+      <div class="team-initial">J</div>
+      <div class="team-dot"></div>
+      <div class="team-name">Juldeh Jalloh</div>
+      <div class="team-role">Co-Founder</div>
+    </div>
+    <div class="team-card reveal reveal-delay-2">
+        <img src="h.jpeg" alt="">
+      <div class="team-initial">H</div>
+      <div class="team-dot"></div>
+      <div class="team-name">Hawanatu Kamara</div>
+      <div class="team-role">Co-Founder</div>
+    </div>
+    <div class="team-card reveal reveal-delay-3">
+        <img src="h.jpeg" alt="">
+      <div class="team-initial">E</div>
+      <div class="team-dot"></div>
+      <div class="team-name">Emmanuel Tibo</div>
+      <div class="team-role">Co-Founder</div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="impact" id="impact">
+  <div class="impact-item reveal">
+    <div class="impact-val">500+</div>
+    <div class="impact-lbl">Households to serve in Year 1</div>
+    <div class="impact-src">Projected target</div>
+  </div>
+  <div class="impact-item reveal reveal-delay-1">
+    <div class="impact-val">20</div>
+    <div class="impact-lbl">Local jobs created in Year 1</div>
+    <div class="impact-src">Projected estimate</div>
+  </div>
+  <div class="impact-item reveal reveal-delay-2">
+    <div class="impact-val">10t</div>
+    <div class="impact-lbl">Waste per month diverted from drains and burning</div>
+    <div class="impact-src">Projected estimate</div>
+  </div>
+  <div class="impact-item reveal reveal-delay-3">
+    <div class="impact-val">3</div>
+    <div class="impact-lbl">UN Sustainable Development Goals addressed</div>
+    <div class="impact-src">SDG 3 · SDG 11 · SDG 13</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">Clean <span>Salone</span><br>Make Salone Agency</div>
+    <div class="footer-tagline">Community-first. Investor-ready. Freetown-built.</div>
+    <div class="footer-copy">© 2026 Clean Salone Make Salone Agency. All rights reserved.</div>
+  </div>
+  <div class="footer-right">
+    <div class="footer-contact">
+      Freetown, Sierra Leone<br>
+      <a href="mailto:hello@cleansalonemakesalone.sl">hello@cleansalonemakesalone.sl</a><br>
+      <a href="#">cleansalonemakesalone.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; ring.style.opacity = '0'; });
+    el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.5'; });
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
