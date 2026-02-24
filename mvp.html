@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clean Salone — Interactive Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0D1F14;
+  --surface:#132218;
+  --card:#1A2E1E;
+  --green:#2ECC71;
+  --darkgreen:#1A7A40;
+  --muted:#4A6B52;
+  --text:#E8F0EA;
+  --subtext:#8AAE92;
+  --wa:#25D366;
+  --wa-dark:#1DA851;
+  --bubble-out:#005C4B;
+  --bubble-in:#1F2C34;
+  --phone-bg:#ECE5DD;
+  --accent:#F0C040;
+}
+
+body{
+  background:var(--bg);
+  font-family:'Syne',sans-serif;
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── LAYOUT ── */
+.app{
+  display:grid;
+  grid-template-columns:320px 1fr 320px;
+  grid-template-rows:72px 1fr;
+  min-height:100vh;
+}
+
+/* TOP BAR */
+.topbar{
+  grid-column:1/-1;
+  background:var(--surface);
+  border-bottom:1px solid rgba(46,204,113,0.1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+}
+.logo{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-0.02em;
+}
+.logo span{color:var(--green);}
+.proto-badge{
+  background:rgba(46,204,113,0.12);
+  border:1px solid rgba(46,204,113,0.3);
+  color:var(--green);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.18em;
+  padding:5px 14px;
+  text-transform:uppercase;
+}
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+.step-counter{
+  font-size:12px;
+  color:var(--subtext);
+}
+.step-counter span{color:var(--green);font-weight:700;}
+.reset-btn{
+  background:none;
+  border:1px solid var(--muted);
+  color:var(--subtext);
+  font-family:'Syne',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.1em;
+  padding:7px 16px;
+  cursor:pointer;
+  text-transform:uppercase;
+  transition:all 0.2s;
+}
+.reset-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* LEFT PANEL — flow map */
+.left-panel{
+  background:var(--surface);
+  border-right:1px solid rgba(255,255,255,0.05);
+  padding:32px 24px;
+  overflow-y:auto;
+}
+.panel-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.2em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:24px;
+}
+.flow-steps{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.flow-step{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+  padding:16px 0;
+  cursor:pointer;
+  position:relative;
+  transition:all 0.2s;
+}
+.flow-step::before{
+  content:'';
+  position:absolute;
+  left:15px;
+  top:48px;
+  bottom:-16px;
+  width:1px;
+  background:rgba(255,255,255,0.06);
+}
+.flow-step:last-child::before{display:none;}
+.step-dot{
+  width:32px;height:32px;
+  border-radius:50%;
+  border:2px solid var(--muted);
+  background:var(--card);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+  flex-shrink:0;
+  transition:all 0.3s;
+  z-index:1;
+}
+.flow-step.active .step-dot{
+  border-color:var(--green);
+  background:var(--green);
+  color:#000;
+  box-shadow:0 0 0 6px rgba(46,204,113,0.12);
+}
+.flow-step.done .step-dot{
+  border-color:var(--darkgreen);
+  background:var(--darkgreen);
+  color:#fff;
+}
+.flow-step.active .step-info-title{color:var(--green);}
+.flow-step.done .step-info-title{color:var(--subtext);}
+.step-info-title{
+  font-size:13px;
+  font-weight:600;
+  color:var(--muted);
+  margin-bottom:3px;
+  transition:color 0.3s;
+}
+.step-info-desc{
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.5;
+  opacity:0.7;
+}
+
+/* Persona toggle */
+.persona-box{
+  margin-top:40px;
+  background:var(--card);
+  border:1px solid rgba(255,255,255,0.06);
+  padding:20px;
+}
+.persona-label{
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+.persona-name{
+  font-family:'Lora',serif;
+  font-size:16px;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.persona-role{font-size:11px;color:var(--subtext);}
+.persona-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+.ptag{
+  background:rgba(46,204,113,0.08);
+  border:1px solid rgba(46,204,113,0.15);
+  color:var(--green);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.1em;
+  padding:3px 8px;
+  text-transform:uppercase;
+}
+
+/* CENTER — phone */
+.center-panel{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:40px 24px;
+  background:var(--bg);
+  position:relative;
+}
+
+/* Glow */
+.center-panel::before{
+  content:'';
+  position:absolute;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(46,204,113,0.06) 0%,transparent 70%);
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+
+/* Phone frame */
+.phone-frame{
+  width:340px;
+  background:#1B1B1E;
+  border-radius:44px;
+  box-shadow:
+    0 0 0 8px #0a0a0a,
+    0 0 0 10px #1a1a1a,
+    0 40px 80px rgba(0,0,0,0.6),
+    0 0 80px rgba(46,204,113,0.06);
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+
+/* Notch */
+.phone-notch{
+  background:#0a0a0a;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.notch-island{
+  width:100px;height:20px;
+  background:#000;
+  border-radius:0 0 16px 16px;
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;
+}
+.notch-cam{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:#1a1a1a;
+  border:1px solid #333;
+}
+.notch-speaker{
+  width:40px;height:4px;
+  background:#1a1a1a;
+  border-radius:4px;
+}
+
+/* WA Header */
+.wa-header{
+  background:#1F2C34;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.wa-back{color:#8E9BAB;font-size:20px;line-height:1;}
+.wa-avatar{
+  width:36px;height:36px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--green),var(--darkgreen));
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  color:#fff;
+  font-weight:700;
+}
+.wa-info{flex:1;}
+.wa-name{font-size:14px;font-weight:700;color:#E9EDEF;line-height:1.2;}
+.wa-status{font-size:11px;color:var(--wa);}
+.wa-icons{display:flex;gap:16px;color:#8E9BAB;font-size:18px;}
+
+/* Chat area */
+.chat-area{
+  background:var(--phone-bg);
+  min-height:480px;
+  max-height:480px;
+  overflow-y:auto;
+  padding:16px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  position:relative;
+  scroll-behavior:smooth;
+}
+
+/* Wallpaper pattern */
+.chat-area::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+
+.chat-date{
+  text-align:center;
+  font-size:11px;
+  color:#667781;
+  background:rgba(0,0,0,0.1);
+  padding:4px 12px;
+  border-radius:8px;
+  align-self:center;
+  margin:8px 0;
+  font-family:sans-serif;
+  font-weight:400;
+}
+
+.msg{
+  display:flex;
+  flex-direction:column;
+  max-width:80%;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 0.3s ease,transform 0.3s ease;
+}
+.msg.show{opacity:1;transform:translateY(0);}
+
+.msg.in{align-self:flex-start;}
+.msg.out{align-self:flex-end;}
+
+.bubble{
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:13px;
+  line-height:1.5;
+  font-family:sans-serif;
+  font-weight:400;
+  position:relative;
+  word-break:break-word;
+}
+.msg.in .bubble{
+  background:#fff;
+  color:#111B21;
+  border-top-left-radius:0;
+  box-shadow:0 1px 2px rgba(0,0,0,0.1);
+}
+.msg.out .bubble{
+  background:var(--bubble-out);
+  color:#E9EDEF;
+  border-top-right-radius:0;
+  box-shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+.bubble-time{
+  font-size:10px;
+  color:rgba(0,0,0,0.35);
+  margin-top:2px;
+  text-align:right;
+  font-family:sans-serif;
+}
+.msg.out .bubble-time{color:rgba(200,230,210,0.6);}
+.bubble-tick{color:var(--wa);margin-left:2px;}
+
+.bot-name{
+  font-size:10px;
+  font-weight:700;
+  color:var(--darkgreen);
+  margin-bottom:2px;
+  font-family:sans-serif;
+}
+
+/* Quick reply chips */
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:8px 12px 4px;
+  background:var(--phone-bg);
+}
+.chip{
+  background:#fff;
+  border:1.5px solid var(--wa);
+  color:var(--wa-dark);
+  font-size:12px;
+  font-family:sans-serif;
+  font-weight:600;
+  padding:6px 14px;
+  border-radius:18px;
+  cursor:pointer;
+  transition:all 0.15s;
+  white-space:nowrap;
+}
+.chip:hover{background:var(--wa);color:#fff;}
+.chip:active{transform:scale(0.96);}
+
+/* WA Input bar */
+.wa-input-bar{
+  background:#1F2C34;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.wa-input{
+  flex:1;
+  background:#2A3942;
+  border:none;
+  border-radius:20px;
+  padding:9px 16px;
+  color:#E9EDEF;
+  font-size:13px;
+  font-family:sans-serif;
+  outline:none;
+}
+.wa-input::placeholder{color:#8E9BAB;}
+.wa-send{
+  width:40px;height:40px;
+  border-radius:50%;
+  background:var(--wa);
+  border:none;
+  color:#fff;
+  font-size:18px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s;
+  flex-shrink:0;
+}
+.wa-send:hover{background:var(--wa-dark);}
+
+/* Typing indicator */
+.typing-indicator{
+  display:none;
+  align-items:center;
+  gap:4px;
+  padding:8px 12px;
+  background:#fff;
+  border-radius:8px;
+  border-top-left-radius:0;
+  width:60px;
+  align-self:flex-start;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+.typing-indicator.show{display:flex;opacity:1;}
+.dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#90939A;
+  animation:bounce 1.2s infinite;
+}
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+
+/* RIGHT PANEL */
+.right-panel{
+  background:var(--surface);
+  border-left:1px solid rgba(255,255,255,0.05);
+  padding:32px 24px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.context-block{
+  margin-bottom:28px;
+  opacity:0;
+  transform:translateX(12px);
+  transition:all 0.4s ease;
+}
+.context-block.show{opacity:1;transform:translateX(0);}
+.context-title{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.context-body{
+  font-size:13px;
+  color:var(--subtext);
+  line-height:1.65;
+}
+.context-body strong{color:var(--text);font-weight:600;}
+
+.insight-card{
+  background:var(--card);
+  border-left:2px solid var(--green);
+  padding:14px 16px;
+  margin-top:8px;
+}
+.insight-card p{
+  font-size:12px;
+  color:var(--subtext);
+  line-height:1.6;
+}
+.insight-card p strong{color:var(--green);}
+
+.stage-tag{
+  display:inline-block;
+  background:rgba(46,204,113,0.1);
+  border:1px solid rgba(46,204,113,0.25);
+  color:var(--green);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.12em;
+  padding:4px 10px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+/* Progress bar */
+.progress-wrap{
+  margin-top:auto;
+  padding-top:24px;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.progress-bar{
+  height:4px;
+  background:rgba(255,255,255,0.06);
+  border-radius:2px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--darkgreen),var(--green));
+  border-radius:2px;
+  transition:width 0.5s ease;
+}
+
+/* Next step btn */
+.next-btn{
+  width:100%;
+  background:var(--green);
+  color:#000;
+  border:none;
+  font-family:'Syne',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  padding:14px;
+  cursor:pointer;
+  margin-top:16px;
+  transition:background 0.2s,transform 0.1s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.next-btn:hover{background:var(--wa);}
+.next-btn:active{transform:scale(0.98);}
+.next-btn:disabled{background:var(--muted);cursor:not-allowed;opacity:0.5;}
+.next-btn svg{transition:transform 0.2s;}
+.next-btn:hover svg{transform:translateX(3px);}
+
+/* Completion screen */
+.completion{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 24px;
+  gap:16px;
+}
+.completion.show{display:flex;}
+.check-circle{
+  width:72px;height:72px;
+  border-radius:50%;
+  background:rgba(46,204,113,0.12);
+  border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;
+  animation:popIn 0.4s cubic-bezier(0.68,-0.55,0.27,1.55) forwards;
+}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.completion h3{
+  font-family:'Lora',serif;
+  font-size:22px;
+  color:var(--text);
+  font-style:italic;
+}
+.completion p{font-size:13px;color:var(--subtext);line-height:1.7;max-width:200px;}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="logo">Clean <span>Salone</span></div>
+    <div class="proto-badge">Clickable Prototype</div>
+    <div class="topbar-right">
+      <div class="step-counter">Step <span id="stepNum">1</span> of 7</div>
+      <button class="reset-btn" onclick="resetProto()">↺ Restart</button>
+    </div>
+  </header>
+
+  <!-- LEFT: FLOW MAP -->
+  <aside class="left-panel">
+    <div class="panel-label">User Journey Flow</div>
+    <div class="flow-steps" id="flowSteps">
+      <div class="flow-step active" data-step="0">
+        <div class="step-dot">1</div>
+        <div>
+          <div class="step-info-title">First Contact</div>
+          <div class="step-info-desc">User messages CleanSalone bot</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="1">
+        <div class="step-dot">2</div>
+        <div>
+          <div class="step-info-title">Service Selection</div>
+          <div class="step-info-desc">Choose household or business</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="2">
+        <div class="step-dot">3</div>
+        <div>
+          <div class="step-info-title">Location Input</div>
+          <div class="step-info-desc">Enter neighbourhood</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="3">
+        <div class="step-dot">4</div>
+        <div>
+          <div class="step-info-title">Plan Selection</div>
+          <div class="step-info-desc">Pick collection frequency & price</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="4">
+        <div class="step-dot">5</div>
+        <div>
+          <div class="step-info-title">Payment</div>
+          <div class="step-info-desc">Mobile money confirmation</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="5">
+        <div class="step-dot">6</div>
+        <div>
+          <div class="step-info-title">Booking Confirmed</div>
+          <div class="step-info-desc">Receipt + first pickup scheduled</div>
+        </div>
+      </div>
+      <div class="flow-step" data-step="6">
+        <div class="step-dot">7</div>
+        <div>
+          <div class="step-info-title">Green Points</div>
+          <div class="step-info-desc">Recycling rewards explained</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Persona -->
+    <div class="persona-box">
+      <div class="persona-label">Testing with Persona</div>
+      <div class="persona-name">Aminata</div>
+      <div class="persona-role">Household Resident · Goderich</div>
+      <div class="persona-tags">
+        <span class="ptag">Basic phone</span>
+        <span class="ptag">Le 50k WTP</span>
+        <span class="ptag">3 kids</span>
+        <span class="ptag">WhatsApp user</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: PHONE -->
+  <main class="center-panel">
+    <div class="phone-frame">
+      <!-- Notch -->
+      <div class="phone-notch">
+        <div class="notch-island">
+          <div class="notch-cam"></div>
+          <div class="notch-speaker"></div>
+        </div>
+      </div>
+
+      <!-- WA Header -->
+      <div class="wa-header">
+        <div class="wa-back">‹</div>
+        <div class="wa-avatar">CS</div>
+        <div class="wa-info">
+          <div class="wa-name">CleanSalone 🌿</div>
+          <div class="wa-status">● online</div>
+        </div>
+        <div class="wa-icons">
+          <span>📹</span>
+          <span>📞</span>
+          <span>⋮</span>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-area" id="chatArea">
+        <div class="chat-date">Today</div>
+        <div class="typing-indicator" id="typing">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- Chips -->
+      <div class="chips" id="chipsArea"></div>
+
+      <!-- Input bar -->
+      <div class="wa-input-bar">
+        <span style="color:#8E9BAB;font-size:20px;">😊</span>
+        <input class="wa-input" id="waInput" placeholder="Type a message" readonly>
+        <button class="wa-send" id="waSend" onclick="handleSend()">➤</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT: CONTEXT -->
+  <aside class="right-panel" id="rightPanel">
+    <div class="context-block show" id="ctx0">
+      <div class="stage-tag">Stage 1</div>
+      <div class="context-title">What's Happening</div>
+      <div class="context-body">
+        <strong>Aminata</strong> found CleanSalone via a neighbour's WhatsApp referral. She's messaging for the first time.
+        <br><br>
+        The bot responds instantly — no human needed. This is the <strong>zero-friction entry point</strong>.
+      </div>
+      <div class="insight-card">
+        <p><strong>Design decision:</strong> WhatsApp was chosen because <strong>62% of survey respondents</strong> already use it daily. No new app = no adoption barrier.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx1">
+      <div class="stage-tag">Stage 2</div>
+      <div class="context-title">Service Type</div>
+      <div class="context-body">
+        Two clear options. <strong>No jargon</strong>. Simple language. The bot uses Krio-friendly English that feels natural in Freetown.
+      </div>
+      <div class="insight-card">
+        <p><strong>Key insight:</strong> Market traders need different pickup frequency than households. Segmentation starts here, not later.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx2">
+      <div class="stage-tag">Stage 3</div>
+      <div class="context-title">Location Capture</div>
+      <div class="context-body">
+        Aminata types her neighbourhood name. No GPS needed. The bot recognises <strong>Goderich</strong> as a Phase 1 area — covered from Month 1.
+      </div>
+      <div class="insight-card">
+        <p><strong>Survey data:</strong> Goderich and Lumley have the highest willingness-to-pay density — our <strong>beachhead market</strong>.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx3">
+      <div class="stage-tag">Stage 4</div>
+      <div class="context-title">Plan & Pricing</div>
+      <div class="context-body">
+        Three tiers. Transparent pricing. The <strong>Le 30,000/month</strong> entry tier is priced below stated WTP of Le 50,000 — to maximise first-trial conversion.
+      </div>
+      <div class="insight-card">
+        <p><strong>Friction point:</strong> This is where users drop off most. Solution: show value first, price second. First 2 weeks FREE.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx4">
+      <div class="stage-tag">Stage 5</div>
+      <div class="context-title">Payment Flow</div>
+      <div class="context-body">
+        Orange Money / Afrimoney. No cash. No bank account needed. The bot sends a <strong>pay prompt</strong> directly inside WhatsApp.
+      </div>
+      <div class="insight-card">
+        <p><strong>Trust signal:</strong> Payment confirmation SMS arrives instantly. This proof-of-transaction is critical for first-time users.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx5">
+      <div class="stage-tag">Stage 6</div>
+      <div class="context-title">Booking Confirmed</div>
+      <div class="context-body">
+        Aminata gets her <strong>booking reference</strong>, first pickup date, and collector's name. Named collectors build neighbourhood trust.
+      </div>
+      <div class="insight-card">
+        <p><strong>Retention driver:</strong> Day-before SMS reminder reduces no-shows and builds the habit of putting waste out on collection day.</p>
+      </div>
+    </div>
+
+    <div class="context-block" id="ctx6">
+      <div class="stage-tag">Stage 7</div>
+      <div class="context-title">Green Points Onboarding</div>
+      <div class="context-body">
+        The recycling reward is introduced <strong>after</strong> the core transaction — not during. This keeps the booking flow clean and introduces upsell naturally.
+      </div>
+      <div class="insight-card">
+        <p><strong>Survey data:</strong> <strong>69% of respondents</strong> said they'd exchange recyclables for discounts or cash. This is a retention multiplier.</p>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Journey Progress</span>
+        <span id="pctLabel">14%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:14%"></div>
+      </div>
+      <button class="next-btn" id="nextBtn" onclick="nextStep()">
+        Next Step
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+// ── CONVERSATION SCRIPT ──
+const steps = [
+  // 0: First contact
+  {
+    incoming: [
+      { from:'bot', text:'👋 *Welcome to CleanSalone!* 🌿\n\nWe provide reliable, affordable waste collection for Freetown households and businesses.\n\nHow can I help you today?' }
+    ],
+    chips: ['📦 Book a collection', 'ℹ️ Learn more', '♻️ Green Points'],
+    input: '📦 Book a collection',
+    outgoing: { text:'📦 Book a collection' }
+  },
+  // 1: Service type
+  {
+    incoming: [
+      { from:'bot', text:'Great choice! 🎉\n\nAre you booking for a *household* or a *business/market stall*?' }
+    ],
+    chips: ['🏠 Household', '🏪 Business / Market'],
+    input: '🏠 Household',
+    outgoing: { text:'🏠 Household' }
+  },
+  // 2: Location
+  {
+    incoming: [
+      { from:'bot', text:'Perfect. Which neighbourhood are you in?\n\nJust type your area name 👇' }
+    ],
+    chips: [],
+    input: 'Goderich',
+    outgoing: { text:'Goderich' },
+    typedInput: true
+  },
+  // 3: Plan selection
+  {
+    incoming: [
+      { from:'bot', text:'✅ *Goderich* — great news, we serve your area!\n\nChoose your collection plan:\n\n🟢 *Basic* — Weekly · Le 30,000/month\n🟡 *Standard* — 2x/week · Le 50,000/month\n🔵 *Family* — 3x/week · Le 75,000/month\n\n_First 2 weeks FREE — no commitment_' }
+    ],
+    chips: ['🟢 Basic – Le 30k', '🟡 Standard – Le 50k', '🔵 Family – Le 75k'],
+    input: '🟢 Basic – Le 30k',
+    outgoing: { text:'🟢 Basic – Le 30,000/month' }
+  },
+  // 4: Payment
+  {
+    incoming: [
+      { from:'bot', text:'🛒 *Order Summary*\n─────────────\nPlan: Basic Weekly\nFirst pickup: This Saturday\nCost: Le 30,000/month\n_Free for your first 2 weeks!_\n─────────────\n\nHow would you like to pay after your free trial?\n\n💚 Orange Money\n💛 Afrimoney' }
+    ],
+    chips: ['💚 Orange Money', '💛 Afrimoney', '🎁 Start free trial'],
+    input: '🎁 Start free trial',
+    outgoing: { text:'🎁 Start free trial now' }
+  },
+  // 5: Confirmed
+  {
+    incoming: [
+      { from:'bot', text:'🎉 *Booking Confirmed!*\n─────────────\n📋 Ref: *CS-2026-0847*\n📅 First pickup: *Saturday, 28 Feb*\n👷 Collector: *Ibrahim* (📞 078-XXXX)\n📍 Area: Goderich West\n─────────────\n\nYou\'ll get a reminder SMS the evening before. Put your waste outside by *7am* on collection day. ✅' }
+    ],
+    chips: ['♻️ Tell me about Green Points', '👥 Refer a neighbour'],
+    input: '♻️ Tell me about Green Points',
+    outgoing: { text:'♻️ Tell me about Green Points' }
+  },
+  // 6: Green Points
+  {
+    incoming: [
+      { from:'bot', text:'♻️ *Green Points — turn waste into money!*\n\nSort your plastic, metal or paper into the green bag we provide. Our collector weighs it on pickup.\n\n*1kg recyclables = 50 Green Points*\n*500 points = Le 5,000 mobile money*\n\nYou can also use points to get a *free month* of collection! 🌱\n\nWant us to bring your first green bag on Saturday?' }
+    ],
+    chips: ['✅ Yes please!', '📤 Share with a friend'],
+    input: '✅ Yes please!',
+    outgoing: { text:'✅ Yes please! Bring my green bag.' },
+    final: true
+  }
+];
+
+let currentStep = 0;
+let waitingForNext = false;
+
+function getTime(){
+  const d=new Date();
+  return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+
+function addMsg(from, text, animate=true){
+  const chat = document.getElementById('chatArea');
+  const typing = document.getElementById('typing');
+
+  const div = document.createElement('div');
+  div.className = 'msg '+(from==='out'?'out':'in');
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  // Convert *bold* and _italic_
+  bubble.innerHTML = text
+    .replace(/\*(.*?)\*/g,'<strong>$1</strong>')
+    .replace(/_(.*?)_/g,'<em style="font-style:italic">$1</em>')
+    .replace(/\n/g,'<br>');
+
+  const time = document.createElement('div');
+  time.className = 'bubble-time';
+  time.innerHTML = getTime() + (from==='out'?' <span class="bubble-tick">✓✓</span>':'');
+
+  if(from==='in'){
+    const name = document.createElement('div');
+    name.className = 'bot-name';
+    name.textContent = 'CleanSalone 🌿';
+    div.appendChild(name);
+  }
+
+  div.appendChild(bubble);
+  div.appendChild(time);
+
+  // Insert before typing indicator
+  chat.insertBefore(div, typing);
+
+  if(animate){
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>div.classList.add('show'));
+    });
+  } else {
+    div.classList.add('show');
+  }
+
+  setTimeout(()=>chat.scrollTop=chat.scrollHeight,100);
+  return div;
+}
+
+function showTyping(){
+  const t = document.getElementById('typing');
+  t.classList.add('show');
+  const chat = document.getElementById('chatArea');
+  setTimeout(()=>chat.scrollTop=chat.scrollHeight,50);
+}
+
+function hideTyping(){
+  document.getElementById('typing').classList.remove('show');
+}
+
+function setChips(chips){
+  const area = document.getElementById('chipsArea');
+  area.innerHTML = '';
+  chips.forEach(label=>{
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = label;
+    btn.onclick = ()=>{
+      const input = document.getElementById('waInput');
+      input.value = label;
+      handleSend();
+    };
+    area.appendChild(btn);
+  });
+}
+
+function updateFlow(step){
+  document.querySelectorAll('.flow-step').forEach((el,i)=>{
+    el.classList.remove('active','done');
+    if(i < step) el.classList.add('done');
+    if(i === step) el.classList.add('active');
+  });
+  document.getElementById('stepNum').textContent = step+1;
+
+  const pct = Math.round(((step+1)/7)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('pctLabel').textContent = pct+'%';
+
+  // Show right context
+  document.querySelectorAll('.context-block').forEach((el,i)=>{
+    el.classList.toggle('show', i===step);
+  });
+}
+
+function handleSend(){
+  if(waitingForNext) return;
+  const stepData = steps[currentStep];
+  const inputEl = document.getElementById('waInput');
+  const sendBtn = document.getElementById('waSend');
+
+  // Show outgoing message
+  addMsg('out', stepData.outgoing.text);
+  inputEl.value = '';
+  document.getElementById('chipsArea').innerHTML = '';
+
+  waitingForNext = true;
+  sendBtn.disabled = true;
+
+  // Typing indicator then bot replies
+  setTimeout(()=>{
+    showTyping();
+    const delay = 800 + Math.random()*600;
+    setTimeout(()=>{
+      hideTyping();
+      const nextStepData = steps[currentStep+1];
+      if(nextStepData){
+        nextStepData.incoming.forEach((msg,i)=>{
+          setTimeout(()=>addMsg('in',msg.text), i*200);
+        });
+        setTimeout(()=>{
+          setChips(nextStepData.chips);
+          if(nextStepData.typedInput){
+            inputEl.placeholder = 'Type your neighbourhood...';
+            inputEl.removeAttribute('readonly');
+            document.getElementById('waSend').onclick = ()=>{
+              const val = inputEl.value.trim();
+              if(!val) return;
+              steps[currentStep+1].outgoing = {text: val || 'Goderich'};
+              handleSend();
+            };
+          } else {
+            inputEl.placeholder = 'Or tap an option above';
+            inputEl.setAttribute('readonly','');
+            document.getElementById('waSend').onclick = handleSend;
+          }
+          waitingForNext = false;
+          sendBtn.disabled = false;
+          currentStep++;
+          updateFlow(currentStep);
+
+          if(steps[currentStep].final){
+            document.getElementById('nextBtn').textContent = '✓ Journey Complete';
+            document.getElementById('nextBtn').disabled = true;
+          }
+        }, nextStepData.incoming.length * 200 + 300);
+      }
+    }, delay);
+  }, 300);
+}
+
+function nextStep(){
+  if(currentStep >= steps.length-1) return;
+  // Auto-select first chip or use predefined input
+  const stepData = steps[currentStep];
+  if(stepData.chips.length > 0){
+    const inputEl = document.getElementById('waInput');
+    inputEl.value = stepData.input || stepData.chips[0];
+  }
+  handleSend();
+}
+
+function resetProto(){
+  currentStep = 0;
+  waitingForNext = false;
+
+  // Clear chat
+  const chat = document.getElementById('chatArea');
+  const typing = document.getElementById('typing');
+  while(chat.firstChild && chat.firstChild !== typing){
+    chat.removeChild(chat.firstChild);
+  }
+  // Re-add date
+  const dateDiv = document.createElement('div');
+  dateDiv.className = 'chat-date';
+  dateDiv.textContent = 'Today';
+  chat.insertBefore(dateDiv, typing);
+  hideTyping();
+
+  document.getElementById('chipsArea').innerHTML = '';
+  document.getElementById('waInput').value = '';
+  document.getElementById('waInput').placeholder = 'Type a message';
+  document.getElementById('waInput').setAttribute('readonly','');
+  document.getElementById('waSend').onclick = handleSend;
+  document.getElementById('waSend').disabled = false;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = '';
+  nextBtn.innerHTML = 'Next Step <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  nextBtn.disabled = false;
+
+  updateFlow(0);
+  // Restart
+  setTimeout(initProto, 100);
+}
+
+function initProto(){
+  const step0 = steps[0];
+  // Typing first
+  showTyping();
+  setTimeout(()=>{
+    hideTyping();
+    step0.incoming.forEach((msg,i)=>{
+      setTimeout(()=>addMsg('in',msg.text), i*200);
+    });
+    setTimeout(()=>{
+      setChips(step0.chips);
+      document.getElementById('waInput').placeholder = 'Or tap an option above';
+    }, step0.incoming.length*200 + 200);
+  }, 900);
+}
+
+// Start
+initProto();
+</script>
+</body>
+</html>
